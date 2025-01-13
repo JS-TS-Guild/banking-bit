@@ -36,6 +36,16 @@ class GlobalRegistry {
     return bankAccounts;
   }
 
+  static doUserHaveAccount(userId: string, bankId: string): BankAccount {
+    const bank = this.getBank(bankId);
+    const userAccounts = this.getUserBankAccounts(userId);
+
+    const account = userAccounts.filter(
+      (account) => account.getBank().getId() === bank.getId()
+    )[0];
+    return account;
+  }
+
   static getBankBalanceOfUser(userId: string): number {
     const userAccountIds = this.getUserBankAccountIds(userId);
 

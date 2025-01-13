@@ -48,12 +48,9 @@ class Bank {
     senderId: string,
     recieverId: string,
     amount: number,
-    receiverBankId?: string
+    bankId?: string
   ): void {
     const senderBankAccounts = GlobalRegistry.getUserBankAccounts(senderId);
-    const recieverBankAccountsIds =
-      GlobalRegistry.getUserBankAccounts(recieverId);
-
     const totalMoneySenderHave = GlobalRegistry.getBankBalanceOfUser(senderId);
 
     const isNegativeAllowed = this.getAllowNegativeBalance();
@@ -63,27 +60,17 @@ class Bank {
     }
 
     let reciverBankAccount: BankAccount;
+    const receiverBankId = bankId ?? this.id;
+    reciverBankAccount = GlobalRegistry.doUserHaveAccount(
+      recieverId,
+      receiverBankId
+    );
 
-    if (receiverBankId && receiverBankId !== this.id) {
-      const getReciverBank = GlobalRegistry.getBank(receiverBankId);
-      const recieverAccountId =
-        GlobalRegistry.getUserBankAccountIds(recieverId)[0];
-      if (!receiverBankId) {
-        throw new Error("User Account not found");
-      }
-      reciverBankAccount = getReciverBank.getAccount(recieverAccountId);
-    } else {
-      const recieverAccountId =
-        GlobalRegistry.getUserBankAccountIds(recieverId)[0];
-      if (!receiverBankId) {
-        throw new Error("User Account not found");
-      }
-      reciverBankAccount = this.getAccount(recieverAccountId);
-    }
     TransactionService.tranferMoney(
       senderBankAccounts,
       reciverBankAccount,
-      amount
+      amount,
+      isNegativeAllowed
     );
   }
 }

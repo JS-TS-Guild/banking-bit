@@ -4,7 +4,8 @@ class TransactionService {
   static tranferMoney(
     senderBankAccounts: BankAccount[],
     reciverBankAccount: BankAccount,
-    amount: number
+    amount: number,
+    isNegativeAllowed: boolean
   ): void {
     let remaningAmount = amount;
     for (const senderBankAccount of senderBankAccounts) {
@@ -16,7 +17,11 @@ class TransactionService {
     }
 
     if (remaningAmount > 0) {
-      throw new Error("Insufficient funds");
+      if (isNegativeAllowed) {
+        senderBankAccounts[0].withdraw(remaningAmount);
+      } else {
+        throw new Error("Insufficient funds");
+      }
     }
 
     reciverBankAccount.deposit(amount);
