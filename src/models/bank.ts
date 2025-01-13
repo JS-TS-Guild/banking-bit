@@ -74,9 +74,7 @@ class Bank {
       );
 
       if (matchingAccounts.length === 0) {
-        throw new Error(
-          "The receiver does not have an account in thespecified bank"
-        );
+        throw new Error("The receiver does not have an account in the bank");
       }
 
       reciverBankAccount = BankToSendMoney.getAccount(matchingAccounts[0]);
@@ -96,19 +94,26 @@ class Bank {
     let transferedMoney = 0;
 
     for (const senderBankAccountId of senderBankAccountsIds) {
-      if (transferedMoney >= amount) break;
       const senderBankAccount =
         GlobalRegistry.getBankAccount(senderBankAccountId);
       const balance = senderBankAccount.getBalance();
       const transferableMoney = Math.min(balance, amount - transferedMoney);
       transferedMoney += transferableMoney;
-
-      TransactionService.sendMoney(
-        senderBankAccount,
-        reciverBankAccount,
-        transferableMoney
-      );
+      if (transferedMoney >= amount) break;
+      TransactionService.sendMoney(senderBankAccount, transferableMoney);
     }
+
+    if (transferedMoney < amount) {
+      if (isNegativeAllowed) {
+        TransactionService.sendMoney(
+          reciverBankAccount,
+          amount - transferedMoney
+        );
+      } else {
+        throw new Error("Insufficient funds");
+      }
+    }
+    reciverBankAccount.deposit(amount);
   }
 }
 

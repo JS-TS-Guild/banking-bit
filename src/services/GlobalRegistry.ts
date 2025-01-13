@@ -7,16 +7,12 @@ class GlobalRegistry {
   private static banks: Bank[] = [];
   private static bankAccounts: BankAccount[] = [];
 
-  static getBankAccounts(): BankAccount[] {
-    return this.bankAccounts;
+  static getBank(bankId: string): Bank {
+    return this.banks.filter((bank) => bank.getId() === bankId)[0];
   }
 
-  static getBanks(): Bank[] {
-    return this.banks;
-  }
-
-  static getUsers(): User[] {
-    return this.users;
+  static getUser(userId: string): User[] {
+    return this.users.filter((user) => user.getId() === userId);
   }
 
   static getUserBankAccounts(userId: string): string[] {
@@ -39,10 +35,6 @@ class GlobalRegistry {
     return this.bankAccounts.filter(
       (account) => account.getId() === accountId
     )[0];
-  }
-
-  static getBank(bankId: string): Bank {
-    return this.banks.filter((bank) => bank.getId() === bankId)[0];
   }
 
   static registerBankAccount(account: BankAccount): void {
