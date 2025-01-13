@@ -30,14 +30,7 @@ class BankAccount {
   }
 
   withdraw(amount: number): void {
-    if (amount < 0) throw new Error("Withdrawal amount must be positive.");
-    const moneyCanBeWithdrawn = Math.min(this.getBalance(), amount);
-
-    if (!this.bank.getAllowNegativeBalance()) {
-      this.balance -= moneyCanBeWithdrawn;
-    } else {
-      this.balance -= amount;
-    }
+    this.balance -= amount;
   }
 }
 

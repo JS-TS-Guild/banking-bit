@@ -41,6 +41,10 @@ class GlobalRegistry {
     )[0];
   }
 
+  static getBank(bankId: string): Bank {
+    return this.banks.filter((bank) => bank.getId() === bankId)[0];
+  }
+
   static registerBankAccount(account: BankAccount): void {
     this.bankAccounts.push(account);
   }

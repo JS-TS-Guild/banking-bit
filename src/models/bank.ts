@@ -54,19 +54,43 @@ class Bank {
     const recieverBankAccountsIds =
       GlobalRegistry.getUserBankAccounts(recieverId);
 
-    const reciverBankAccount = GlobalRegistry.getBankAccount(
-      recieverBankAccountsIds[0]
-    );
-
     const totalMoneySenderHave = GlobalRegistry.getBankBalanceOfUser(senderId);
 
     const isNegativeAllowed = this.getAllowNegativeBalance();
 
-    console.log(isNegativeAllowed);
-    console.log(totalMoneySenderHave);
-
     if (totalMoneySenderHave < amount && !isNegativeAllowed) {
       throw new Error("Insufficient funds");
+    }
+
+    let reciverBankAccount: BankAccount;
+
+    if (receiverBankId && receiverBankId !== this.id) {
+      const BankToSendMoney = GlobalRegistry.getBank(receiverBankId);
+
+      const matchingAccounts = recieverBankAccountsIds.filter((accountId) =>
+        BankToSendMoney.getAccounts().some(
+          (bankAccount) => bankAccount.getId() === accountId
+        )
+      );
+
+      if (matchingAccounts.length === 0) {
+        throw new Error(
+          "The receiver does not have an account in thespecified bank"
+        );
+      }
+
+      reciverBankAccount = BankToSendMoney.getAccount(matchingAccounts[0]);
+    } else {
+      const matchingAccounts = recieverBankAccountsIds.filter((accountId) =>
+        this.getAccounts().some(
+          (bankAccount) => bankAccount.getId() === accountId
+        )
+      );
+
+      if (matchingAccounts.length === 0) {
+        throw new Error("The receiver's account could not be found");
+      }
+      reciverBankAccount = this.getAccount(matchingAccounts[0]);
     }
 
     let transferedMoney = 0;
@@ -78,10 +102,6 @@ class Bank {
       const balance = senderBankAccount.getBalance();
       const transferableMoney = Math.min(balance, amount - transferedMoney);
       transferedMoney += transferableMoney;
-
-      console.log(senderBankAccount);
-      console.log(reciverBankAccount);
-      console.log(transferableMoney);
 
       TransactionService.sendMoney(
         senderBankAccount,
