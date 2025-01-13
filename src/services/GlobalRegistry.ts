@@ -15,14 +15,29 @@ class GlobalRegistry {
     return this.users.filter((user) => user.getId() === userId);
   }
 
-  static getUserBankAccounts(userId: string): string[] {
+  static getUserBankAccountIds(userId: string): string[] {
     return this.users
       .filter((user) => user.getId() === userId)[0]
       .getAccounts();
   }
 
+  static getUserBankAccounts(userId: string): BankAccount[] {
+    const bankAccountIds = this.users
+      .filter((user) => user.getId() === userId)[0]
+      .getAccounts();
+
+    const bankAccounts: BankAccount[] = [];
+
+    for (const bankAccountId of bankAccountIds) {
+      const account = this.getBankAccount(bankAccountId);
+      bankAccounts.push(account);
+    }
+
+    return bankAccounts;
+  }
+
   static getBankBalanceOfUser(userId: string): number {
-    const userAccountIds = this.getUserBankAccounts(userId);
+    const userAccountIds = this.getUserBankAccountIds(userId);
 
     const totalBalance = userAccountIds.reduce((total, accountId) => {
       const account = this.getBankAccount(accountId);
