@@ -77,7 +77,7 @@ class Bank {
         GlobalRegistry.getBankAccount(senderBankAccountId);
 
       if (
-        senderBankAccount.getId() != reciverBankAccount.getId() &&
+        senderBankAccount.getId() !== reciverBankAccount.getId() &&
         !receiverBankId
       ) {
         throw new Error(
