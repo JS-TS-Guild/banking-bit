@@ -54,27 +54,9 @@ class Bank {
     const recieverBankAccountsIds =
       GlobalRegistry.getUserBankAccounts(recieverId);
 
-    let reciverBankAccount: BankAccount;
-
-    if (receiverBankId) {
-      const matchingBankAccounts = recieverBankAccountsIds.filter(
-        (accountId) => {
-          const account = GlobalRegistry.getBankAccount(accountId);
-          return account.getBank().getId() === receiverBankId;
-        }
-      );
-
-      if (matchingBankAccounts.length === 0) {
-        throw new Error("Reciever does not have an account in the bank");
-      }
-      reciverBankAccount = GlobalRegistry.getBankAccount(
-        matchingBankAccounts[0]
-      );
-    } else {
-      reciverBankAccount = GlobalRegistry.getBankAccount(
-        recieverBankAccountsIds[0]
-      );
-    }
+    const reciverBankAccount = GlobalRegistry.getBankAccount(
+      recieverBankAccountsIds[0]
+    );
 
     const totalMoneySenderHave = GlobalRegistry.getBankBalanceOfUser(senderId);
 
@@ -93,15 +75,6 @@ class Bank {
       if (transferedMoney >= amount) break;
       const senderBankAccount =
         GlobalRegistry.getBankAccount(senderBankAccountId);
-
-      if (
-        senderBankAccount.getId() !== reciverBankAccount.getId() &&
-        !receiverBankId
-      ) {
-        throw new Error(
-          "Can't transfer money between two different banks without receiver bank id"
-        );
-      }
       const balance = senderBankAccount.getBalance();
       const transferableMoney = Math.min(balance, amount - transferedMoney);
       transferedMoney += transferableMoney;
