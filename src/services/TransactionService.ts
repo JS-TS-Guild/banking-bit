@@ -7,18 +7,26 @@ class TransactionService {
     amount: number,
     isNegativeAllowed: boolean
   ): void {
-    let remaningAmount = amount;
+    let remaning = amount;
+    console.log(remaning);
     for (const senderBankAccount of senderBankAccounts) {
       const balance = senderBankAccount.getBalance();
-      const transferableMoney = Math.min(balance, remaningAmount);
-      senderBankAccount.withdraw(transferableMoney);
-      remaningAmount -= transferableMoney;
-      if (remaningAmount <= 0) break;
+      if (balance > 0) {
+        const transferableMoney = Math.min(balance, remaning);
+        senderBankAccount.withdraw(transferableMoney);
+        remaning -= transferableMoney;
+        if (remaning <= 0) break;
+      }
     }
 
-    if (remaningAmount > 0) {
+    if (remaning > 0) {
       if (isNegativeAllowed) {
-        senderBankAccounts[0].withdraw(remaningAmount);
+        console.log("Negative Balance");
+        senderBankAccounts
+          .filter(
+            (account) => account.getBank().getAllowNegativeBalance() === true
+          )[0]
+          .withdraw(remaning);
       } else {
         throw new Error("Insufficient funds");
       }

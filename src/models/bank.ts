@@ -50,7 +50,10 @@ class Bank {
     amount: number,
     bankId?: string
   ): void {
-    const senderBankAccounts = GlobalRegistry.getUserBankAccounts(senderId);
+    const senderBankAccounts = GlobalRegistry.getUserBankAccounts(
+      senderId,
+      this.id
+    );
     const totalMoneySenderHave = GlobalRegistry.getBankBalanceOfUser(senderId);
 
     const isNegativeAllowed = this.getAllowNegativeBalance();

@@ -11,8 +11,8 @@ class GlobalRegistry {
     return this.banks.filter((bank) => bank.getId() === bankId)[0];
   }
 
-  static getUser(userId: string): User[] {
-    return this.users.filter((user) => user.getId() === userId);
+  static getUser(userId: string): User {
+    return this.users.filter((user) => user.getId() === userId)[0];
   }
 
   static getUserBankAccountIds(userId: string): string[] {
@@ -21,19 +21,18 @@ class GlobalRegistry {
       .getAccounts();
   }
 
-  static getUserBankAccounts(userId: string): BankAccount[] {
-    const bankAccountIds = this.users
-      .filter((user) => user.getId() === userId)[0]
-      .getAccounts();
+  static getUserBankAccounts(userId: string, bankId?: string): BankAccount[] {
+    const user = this.getUser(userId);
+    let bankAccountIds = user.getAccounts();
 
-    const bankAccounts: BankAccount[] = [];
-
-    for (const bankAccountId of bankAccountIds) {
-      const account = this.getBankAccount(bankAccountId);
-      bankAccounts.push(account);
+    if (bankId) {
+      bankAccountIds = bankAccountIds.filter((accountId) => {
+        const account = this.getBankAccount(accountId);
+        return account?.getBank().getId() === bankId;
+      });
     }
 
-    return bankAccounts;
+    return bankAccountIds.map((accountId) => this.getBankAccount(accountId));
   }
 
   static doUserHaveAccount(userId: string, bankId: string): BankAccount {
