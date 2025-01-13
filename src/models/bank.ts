@@ -54,9 +54,27 @@ class Bank {
     const recieverBankAccountsIds =
       GlobalRegistry.getUserBankAccounts(recieverId);
 
-    const reciverBankAccount = GlobalRegistry.getBankAccount(
-      recieverBankAccountsIds[0]
-    );
+    let reciverBankAccount: BankAccount;
+
+    if (receiverBankId) {
+      const matchingBankAccounts = recieverBankAccountsIds.filter(
+        (accountId) => {
+          const account = GlobalRegistry.getBankAccount(accountId);
+          return account.getBank().getId() === receiverBankId;
+        }
+      );
+
+      if (matchingBankAccounts.length === 0) {
+        throw new Error("Reciever does not have an account in the bank");
+      }
+      reciverBankAccount = GlobalRegistry.getBankAccount(
+        matchingBankAccounts[0]
+      );
+    } else {
+      reciverBankAccount = GlobalRegistry.getBankAccount(
+        recieverBankAccountsIds[0]
+      );
+    }
 
     const totalMoneySenderHave = GlobalRegistry.getBankBalanceOfUser(senderId);
 
