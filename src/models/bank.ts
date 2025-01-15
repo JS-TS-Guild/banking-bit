@@ -54,27 +54,33 @@ class Bank {
       senderId,
       this.id
     );
-    const totalMoneySenderHave = GlobalRegistry.getBankBalanceOfUser(senderId);
-
+    const totalMoneySenderHave =
+      GlobalRegistry.getTotalMoneyInAccounts(senderBankAccounts);
     const isNegativeAllowed = this.getAllowNegativeBalance();
 
-    if (totalMoneySenderHave < amount && !isNegativeAllowed) {
+    const reciverBankId = bankId ?? this.id;
+    const reciverBankAccount = GlobalRegistry.getUserBankAccounts(
+      recieverId,
+      reciverBankId
+    )[0];
+
+    if (totalMoneySenderHave >= amount) {
+      TransactionService.withdrawMoneyFromAccounts(
+        amount,
+        senderBankAccounts,
+        true
+      );
+      reciverBankAccount.deposit(amount);
+    } else if (isNegativeAllowed) {
+      TransactionService.withdrawMoneyFromAccounts(
+        amount,
+        senderBankAccounts,
+        false
+      );
+      reciverBankAccount.deposit(amount);
+    } else {
       throw new Error("Insufficient funds");
     }
-
-    let reciverBankAccount: BankAccount;
-    const receiverBankId = bankId ?? this.id;
-    reciverBankAccount = GlobalRegistry.doUserHaveAccount(
-      recieverId,
-      receiverBankId
-    );
-
-    TransactionService.tranferMoney(
-      senderBankAccounts,
-      reciverBankAccount,
-      amount,
-      isNegativeAllowed
-    );
   }
 }
 

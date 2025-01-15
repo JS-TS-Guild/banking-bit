@@ -15,12 +15,6 @@ class GlobalRegistry {
     return this.users.filter((user) => user.getId() === userId)[0];
   }
 
-  static getUserBankAccountIds(userId: string): string[] {
-    return this.users
-      .filter((user) => user.getId() === userId)[0]
-      .getAccounts();
-  }
-
   static getUserBankAccounts(userId: string, bankId?: string): BankAccount[] {
     const user = this.getUser(userId);
     let bankAccountIds = user.getAccounts();
@@ -35,26 +29,14 @@ class GlobalRegistry {
     return bankAccountIds.map((accountId) => this.getBankAccount(accountId));
   }
 
-  static doUserHaveAccount(userId: string, bankId: string): BankAccount {
-    const bank = this.getBank(bankId);
-    const userAccounts = this.getUserBankAccounts(userId);
-
-    const account = userAccounts.filter(
-      (account) => account.getBank().getId() === bank.getId()
-    )[0];
-    return account;
+  static getTotalMoneyInAccounts(accounts: BankAccount[]): number {
+    let amount = 0;
+    for (const account of accounts) {
+      amount += account.getBalance();
+    }
+    return amount;
   }
 
-  static getBankBalanceOfUser(userId: string): number {
-    const userAccountIds = this.getUserBankAccountIds(userId);
-
-    const totalBalance = userAccountIds.reduce((total, accountId) => {
-      const account = this.getBankAccount(accountId);
-      return total + account.getBalance();
-    }, 0);
-
-    return totalBalance;
-  }
   static getBankAccount(accountId: string): BankAccount {
     return this.bankAccounts.filter(
       (account) => account.getId() === accountId
