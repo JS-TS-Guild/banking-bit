@@ -5,12 +5,13 @@ class TransactionService {
     amount: number,
     accounts: BankAccount[],
     haveSufficientBalance: Boolean
-  ): void {
+  ): boolean {
     if (haveSufficientBalance) {
-      const transferedAmount = 0;
+      let transferedAmount = 0;
       for (const account of accounts) {
         const balance = account.getBalance();
         const withdrawAbleAmount = Math.min(balance, amount - transferedAmount);
+        transferedAmount += withdrawAbleAmount;
         account.withdraw(withdrawAbleAmount);
         if (transferedAmount >= amount) break;
       }
@@ -24,6 +25,7 @@ class TransactionService {
 
       accounts[0].withdraw(amount - transferedAmount);
     }
+    return true;
   }
 }
 
